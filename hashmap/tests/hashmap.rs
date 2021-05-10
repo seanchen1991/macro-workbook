@@ -66,3 +66,46 @@ fn test_nesting() {
 
     assert_eq!(generated, expected);
 }
+
+mod trybuild {
+    use std::path::PathBuf;
+    use std::process::Command;
+
+    pub fn compile_fail(file_name: &str) {
+        let invalid_path = ["tests", "invalid"].iter().collect::<PathBuf>();
+
+        let mut file_path = invalid_path.clone();
+        file_path.push(file_name);
+
+        assert!(
+            file_path.exists(),
+            "{:?} does not exist.",
+            file_path.into_os_string()
+        );
+
+        let test_name = file_name.replace(".", "-");
+        let macros_dir = ["..", "..", "target", "tests", "hashmap"]
+            .iter()
+            .collect::<PathBuf>();
+
+        let result = Command::new("cargo")
+            .current_dir(invalid_path)
+            .arg("build")
+            .arg("--offline")
+            .arg("--target-dir")
+            .arg(macros_dir)
+            .arg("--bin")
+            .arg(test_name)
+            .output();
+
+        if let Ok(result) = result {
+            assert!(
+                !result.status.success(),
+                "Expected {:?} to fail to compile, but it succeeded",
+                file_path
+            );
+        } else {
+            panic!("Running subprocess failed");
+        }
+    }
+}
