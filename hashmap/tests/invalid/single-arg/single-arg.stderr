@@ -1,0 +1,5 @@
+error: unexpected end of macro invocation
+ --> $DIR/single-arg.rs:6:44
+  |
+6 |     let map: HashMap<_, _> = hashmap!{"foo"};
+  |                                            ^ missing tokens in macro arguments

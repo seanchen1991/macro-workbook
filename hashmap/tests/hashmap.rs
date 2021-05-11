@@ -4,7 +4,7 @@ use std::collections::HashMap;
 #[test]
 fn test_empty() {
     let expected: HashMap<i32, i32> = HashMap::new();
-    let generated: HashMap<i32, i32> = hashmap!();
+    let generated: HashMap<i32, i32> = hashmap!{};
     assert_eq!(generated, expected);
 }
 
@@ -13,7 +13,7 @@ fn test_single() {
     let mut expected = HashMap::new();
     expected.insert("foo", "bar");
 
-    let generated = hashmap!("foo" => "bar");
+    let generated = hashmap!{"foo" => "bar"};
 
     assert_eq!(generated, expected);
 }
@@ -25,7 +25,7 @@ fn test_no_trailing_comma() {
     expected.insert(1, "one");
     expected.insert(2, "two");
 
-    let generated = hashmap!(0 => "zero", 1 => "one", 2 => "two");
+    let generated = hashmap!{0 => "zero", 1 => "one", 2 => "two"};
 
     assert_eq!(generated, expected);
 }
@@ -37,11 +37,11 @@ fn test_trailing_comma() {
     expected.insert(1, "one");
     expected.insert(2, "two");
 
-    let generated = hashmap!(
+    let generated = hashmap!{
         0 => "zero",
         1 => "one",
         2 => "two",
-    );
+    };
 
     assert_eq!(generated, expected);
 }
@@ -56,56 +56,49 @@ fn test_nesting() {
     expected.insert("nested", nested);
     expected.insert("empty", HashMap::new());
 
-    let generated = hashmap!(
-        "nested" => hashmap!(
+    let generated = hashmap!{
+        "nested" => hashmap!{
             "foo" => "bar",
             "qux" => "paz",
-        ),
-        "empty" => hashmap!()
-    );
+        },
+        "empty" => hashmap!{}
+    };
 
     assert_eq!(generated, expected);
 }
 
-mod trybuild {
-    use std::path::PathBuf;
-    use std::process::Command;
+#[test]
+fn test_compile_fails_comma_sep() {
+    let t = trybuild::TestCases::new();
+    t.compile_fail("tests/invalid/comma-sep/comma-sep.rs");
+}
 
-    pub fn compile_fail(file_name: &str) {
-        let invalid_path = ["tests", "invalid"].iter().collect::<PathBuf>();
+#[test]
+fn test_compile_fails_missing_argument() {
+    let t = trybuild::TestCases::new();
+    t.compile_fail("tests/invalid/missing-arg/missing-arg.rs");
+}
 
-        let mut file_path = invalid_path.clone();
-        file_path.push(file_name);
+#[test]
+fn test_compile_fails_no_comma() {
+    let t = trybuild::TestCases::new();
+    t.compile_fail("tests/invalid/no-comma/no-comma.rs");
+}
 
-        assert!(
-            file_path.exists(),
-            "{:?} does not exist.",
-            file_path.into_os_string()
-        );
+#[test]
+fn test_compile_fails_trailing_arrow() {
+    let t = trybuild::TestCases::new();
+    t.compile_fail("tests/invalid/trailing-arrow/trailing-arrow.rs");
+}
 
-        let test_name = file_name.replace(".", "-");
-        let macros_dir = ["..", "..", "target", "tests", "hashmap"]
-            .iter()
-            .collect::<PathBuf>();
+#[test]
+fn test_compile_fails_only_arrow() {
+    let t = trybuild::TestCases::new();
+    t.compile_fail("tests/invalid/only-arrow/only-arrow.rs");
+}
 
-        let result = Command::new("cargo")
-            .current_dir(invalid_path)
-            .arg("build")
-            .arg("--offline")
-            .arg("--target-dir")
-            .arg(macros_dir)
-            .arg("--bin")
-            .arg(test_name)
-            .output();
-
-        if let Ok(result) = result {
-            assert!(
-                !result.status.success(),
-                "Expected {:?} to fail to compile, but it succeeded",
-                file_path
-            );
-        } else {
-            panic!("Running subprocess failed");
-        }
-    }
+#[test]
+fn test_compile_fails_single_arg() {
+    let t = trybuild::TestCases::new();
+    t.compile_fail("tests/invalid/single-arg/single-arg.rs");
 }

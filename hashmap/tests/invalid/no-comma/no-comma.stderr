@@ -1,0 +1,7 @@
+error: no rules expected the token `2`
+ --> $DIR/no-comma.rs:6:48
+  |
+6 |     let map: HashMap<_, _> = hashmap!{1 => 'a' 2 => 'b'};
+  |                                               -^ no rules expected this token in macro call
+  |                                               |
+  |                                               help: missing comma here

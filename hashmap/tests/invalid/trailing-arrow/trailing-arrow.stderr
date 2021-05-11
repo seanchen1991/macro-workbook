@@ -1,0 +1,5 @@
+error: unexpected end of macro invocation
+ --> $DIR/trailing-arrow.rs:6:53
+  |
+6 |     let map: HashMap<_, _> = hashmap!{1 => 'a', 2 =>};
+  |                                                     ^ missing tokens in macro arguments

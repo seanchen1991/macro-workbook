@@ -1,0 +1,5 @@
+error: no rules expected the token `,`
+ --> $DIR/comma-sep.rs:7:42
+  |
+7 |     let map: HashMap<_, _> = hashmap!{'a', 1};
+  |                                          ^ no rules expected this token in macro call

@@ -1,0 +1,5 @@
+error: no rules expected the token `=>`
+ --> $DIR/only-arrow.rs:6:39
+  |
+6 |     let map: HashMap<_, _> = hashmap!{=>};
+  |                                       ^^ no rules expected this token in macro call
